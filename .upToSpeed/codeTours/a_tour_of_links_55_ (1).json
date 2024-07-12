@@ -1,0 +1,122 @@
+{
+  "title": "A Tour of Links",
+  "id": "h4De/Jijfvrby3lA8luHN3qb3rTss513+kQ92gM1pfg=",
+  "steps": [
+    {
+      "type": "textOnly",
+      "description": "Welcome to this code tour about tRPC links! As a TypeScript engineer, you'll find that links are a powerful and flexible feature in tRPC that allow you to customize the flow of data between the client and server.\n\nLet's start with a clear definition: In tRPC, a link is a function that intercepts and potentially modifies requests and responses as they flow between the client and server. Think of links as middleware for your API calls.\n\nLinks in tRPC serve several purposes:\n1. Customizing requests (e.g., adding headers, authentication tokens)\n2. Modifying responses (e.g., error handling, data transformation)\n3. Implementing side effects (e.g., logging, caching)\n4. Controlling the flow of operations (e.g., batching, retrying)\n\nOne of the key concepts in tRPC is the link chain. When you configure your tRPC client, you can provide an array of links. These links form a chain, where each link processes the operation in order, both for outgoing requests and incoming responses. This chain typically ends with a 'terminating link' that actually sends the request to the server.\n\nCommon types of links you'll encounter include:\n- httpBatchLink: Batches multiple operations into a single HTTP request\n- loggerLink: Logs information about operations for debugging\n- splitLink: Conditionally chooses between different links based on the operation\n\nIn this tour, we'll explore the actual source code behind these links and how they're implemented. We'll dive into:\n1. The core types and interfaces that define links\n2. Implementation details of common links\n3. How links are composed and executed in a chain\n4. Error handling within links\n\nBy the end of this tour, you'll have a deep understanding of how links work under the hood, which will empower you to use them effectively in your tRPC applications and even create custom links for specific needs.\n\nLet's get started by examining the fundamental types that define the structure of links in tRPC!",
+      "title": "",
+      "id": "1379"
+    },
+    {
+      "type": "highlight",
+      "description": "Let's start by looking at the TRPCLink type, which is the foundation for all links in tRPC. This type defines the structure that all links must follow.",
+      "file": "packages/client/src/links/types.ts",
+      "highlight": [{ "start": 109, "end": 114 }],
+      "title": "",
+      "id": "1380"
+    },
+    {
+      "type": "highlight",
+      "description": "Now, let's examine the Operation type. This type represents the operation being executed by the client, which is passed to each link in the chain.",
+      "file": "packages/client/src/links/types.ts",
+      "highlight": [{ "start": 34, "end": 43 }],
+      "title": "",
+      "id": "1381"
+    },
+    {
+      "type": "highlight",
+      "description": "Let go through the `httpBatchLink` implementation. This is the recommended terminating link in tRPC, which batches multiple operations into a single HTTP request.",
+      "file": "packages/client/src/links/httpBatchLink.ts",
+      "highlight": [{ "start": 17, "end": 26 }],
+      "title": "",
+      "id": "1390"
+    },
+    {
+      "type": "highlight",
+      "description": "The `batchLoader` function is responsible for creating a BatchLoader for a specific procedure type (query or mutation).",
+      "file": "packages/client/src/links/httpBatchLink.ts",
+      "highlight": [{ "start": 27, "end": 30 }],
+      "title": "",
+      "id": "1391"
+    },
+    {
+      "type": "highlight",
+      "description": "Let's examine the validate method of the `batchLoader`. This method checks if the batched operations can be sent in a single request based on the URL length limit.",
+      "file": "packages/client/src/links/httpBatchLink.ts",
+      "highlight": [{ "start": 31, "end": 47 }],
+      "title": "",
+      "id": "1392"
+    },
+    {
+      "type": "highlight",
+      "description": "The fetch method of the `batchLoader`. This method is responsible for sending the batched operations to the server and processing the response.",
+      "file": "packages/client/src/links/httpBatchLink.ts",
+      "highlight": [{ "start": 48, "end": 84 }],
+      "title": "",
+      "id": "1393"
+    },
+    {
+      "type": "highlight",
+      "description": "Let's see how the query and mutation loaders are created using the `batchLoader` function we just examined.",
+      "file": "packages/client/src/links/httpBatchLink.ts",
+      "highlight": [{ "start": 88, "end": 91 }],
+      "title": "",
+      "id": "1394"
+    },
+    {
+      "type": "highlight",
+      "description": "Lastly, let's examine the main link function that `httpBatchLink` returns. This function creates an observable to handle the operation and uses the appropriate loader based on the operation type.",
+      "file": "packages/client/src/links/httpBatchLink.ts",
+      "highlight": [{ "start": 92, "end": 139 }],
+      "title": "",
+      "id": "1395"
+    },
+    {
+      "type": "highlight",
+      "description": "Now, let's examine the loggerLink. This link doesn't modify the operation but logs information about it, which is useful for debugging and monitoring.",
+      "file": "packages/client/src/links/loggerLink.ts",
+      "highlight": [{ "start": 203, "end": 257 }],
+      "title": "",
+      "id": "1383"
+    },
+    {
+      "type": "highlight",
+      "description": "Let's look at the splitLink, which allows you to conditionally choose between different links based on the operation.",
+      "file": "packages/client/src/links/splitLink.ts",
+      "highlight": [{ "start": 9, "end": 30 }],
+      "title": "",
+      "id": "1384"
+    },
+    {
+      "type": "highlight",
+      "description": "The observable function is a key part of how links handle asynchronous operations. Examine its implementation.",
+      "file": "packages/server/src/observable/observable.ts",
+      "highlight": [{ "start": 24, "end": 48 }],
+      "title": "",
+      "id": "1385"
+    },
+    {
+      "type": "highlight",
+      "description": "The createChain function is a crucial part of tRPC's link system. It's responsible for composing multiple links into a chain and executing them in sequence. Let's break down its implementation and understand how it works in practice.\n\nThe function takes an object with two properties:\n1. links: An array of OperationLink functions\n2. op: The initial Operation object\n\nHere's how the chain execution works:\n\n1. The function returns an observable that, when subscribed to, starts the chain execution.\n2. It defines an inner execute function that recursively calls the next link in the chain.\n3. Each link is called with the current operation and a 'next' function that, when called, executes the subsequent link.\n4. The chain continues until there are no more links to execute.\n\nLet's consider a practical example:\n\nImagine we have a chain with three links: [loggerLink, httpBatchLink, httpLink]\n\n1. execute(0) calls loggerLink\n2. loggerLink logs the operation and calls next(op)\n3. execute(1) calls httpBatchLink\n4. httpBatchLink batches the operation (if possible) and calls next(op)\n5. execute(2) calls httpLink\n6. httpLink sends the HTTP request and returns the result\n\nThis implementation allows each link to modify the operation, perform side effects, or even short-circuit the chain if needed. It's this flexibility that makes tRPC links so powerful for customizing client-server communication.\n\nBy understanding this createChain function, you can see how tRPC implements the link chain concept described in the documentation, allowing for powerful composition of data flow customizations.",
+      "file": "packages/client/src/links/internals/createChain.ts",
+      "highlight": [{ "start": 10, "end": 40 }],
+      "title": "",
+      "id": "1386"
+    },
+    {
+      "type": "highlight",
+      "description": "Now, let's examine how links are configured when creating a tRPC client. We'll look at the createTRPCClient function and discuss how different types of links, including wsLink, are used in practice.\n\nIn this code snippet, we can see the type definitions for different procedure types (query, mutation, subscription) and how they're decorated. This forms the foundation for how links handle different types of operations.\n\nWhen configuring a tRPC client, you typically provide an array of links. For example:\n\n```typescript\nimport { createTRPCClient, httpBatchLink, wsLink, splitLink } from '@trpc/client';\n\nconst client = createTRPCClient<AppRouter>({\n  links: [\n    splitLink({\n      condition: (op) => op.type === 'subscription',\n      true: wsLink({\n        url: 'ws://localhost:3000/trpc',\n      }),\n      false: httpBatchLink({\n        url: 'http://localhost:3000/trpc',\n      }),\n    }),\n  ],\n});\n```\n\nIn this configuration:\n1. We use splitLink to conditionally choose between wsLink and httpBatchLink.\n2. wsLink is used for subscriptions, allowing real-time communication over WebSockets.\n3. httpBatchLink is used for queries and mutations, enabling request batching over HTTP.\n\nThis setup demonstrates how different link types work together:\n- splitLink acts as a router, directing operations to the appropriate link.\n- wsLink and httpBatchLink are terminating links, responsible for actually sending requests to the server.\n\nBy combining these links, we create a flexible and efficient communication layer that can handle different types of operations optimally. This configuration approach allows you to customize the behavior of your tRPC client to suit your application's needs, leveraging the power and flexibility of the link system we've explored throughout this tour.",
+      "file": "packages/client/src/createTRPCClient.ts",
+      "highlight": [{ "start": 53, "end": 68 }],
+      "title": "",
+      "id": "1388"
+    },
+    {
+      "type": "textOnly",
+      "description": "Now that we've explored the core concepts and implementations of tRPC links, let's put this knowledge into practice by creating a custom link. This example will help solidify your understanding and show how the concepts we've discussed map to actual code you might write as a TypeScript engineer.\n\nLet's create a simple 'timing link' that measures how long each operation takes:\n\n```typescript\nimport { TRPCLink } from '@trpc/client';\nimport { observable } from '@trpc/server/observable';\nimport type { AppRouter } from './your-app-router'; // Adjust this import as needed\n\nexport const timingLink: TRPCLink<AppRouter> = () => {\n  // This outer function is called once when the client is created\n  return ({ next, op }) => {\n    // This function is called for each operation\n    return observable((observer) => {\n      const start = Date.now();\n      \n      // Call the next link in the chain\n      const subscription = next(op).subscribe({\n        next(value) {\n          const end = Date.now();\n          console.log(`Operation ${op.type} ${op.path} took ${end - start}ms`);\n          observer.next(value);\n        },\n        error(err) {\n          const end = Date.now();\n          console.log(`Operation ${op.type} ${op.path} failed after ${end - start}ms`);\n          observer.error(err);\n        },\n        complete() {\n          observer.complete();\n        },\n      });\n      \n      // Return an unsubscribe function\n      return () => {\n        subscription.unsubscribe();\n      };\n    });\n  };\n};\n```\n\nThis custom link demonstrates several concepts we've explored:\n\n1. It follows the `TRPCLink` type structure we saw in `packages/client/src/links/types.ts`.\n2. It uses the `observable` function from `@trpc/server/observable` that we examined earlier.\n3. It interacts with the `Operation` type, accessing properties like `op.type` and `op.path`.\n4. It properly handles the 'next', 'error', and 'complete' cases, similar to what we saw in the `httpBatchLink` implementation.\n\nTo use this link, you would add it to your tRPC client configuration:\n\n```typescript\nimport { createTRPCNext } from '@trpc/next';\nimport { httpBatchLink } from '@trpc/client';\nimport { timingLink } from './timingLink';\n\nexport default createTRPCNext<AppRouter>({\n  config() {\n    return {\n      links: [\n        timingLink(), // Our custom link\n        httpBatchLink({\n          url: 'http://localhost:3000/trpc',\n        }),\n      ],\n    };\n  },\n});\n```\n\nThis example demonstrates how you can create custom links to extend tRPC's functionality, allowing you to add timing, logging, error handling, or any other custom behavior to your API calls. By understanding the internals of links, as we've explored in this tour, you're now equipped to create powerful, custom solutions for your tRPC applications.\n\nRemember, the power of links lies in their composability and the ability to separate concerns in your API communication layer. You can create and combine multiple custom links to achieve complex behaviors while keeping your code modular and maintainable.",
+      "title": "",
+      "id": "1389"
+    }
+  ]
+}
