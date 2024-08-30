@@ -1,1 +1,170 @@
-{"title":"tRPC Server: Core Components and Architecture","id":"Clmbyj9AQE3dZugKdxvAd1v5s/W6WBi4jbazUdH/GYw=","steps":[{"type":"textOnly","description":"Welcome to the tour of the tRPC server package. We'll explore the main architecture and different components of the server, including routers, procedures, middleware, and adapters. This package forms the backbone of tRPC's server-side functionality, enabling type-safe API development.","title":"","id":"1587"},{"type":"highlight","description":"Let's start with the core of tRPC server: the initTRPC function. This function is used to create and configure the tRPC instance, setting up the foundation for your API.","file":"packages/server/src/@trpc/server/index.ts","highlight":[{"start":8,"end":9}],"title":"","id":"1588"},{"type":"highlight","description":"The Router type is a key concept in tRPC. It defines the structure of your API, containing procedures and potentially nested routers.","file":"packages/server/src/unstable-core-do-not-import/router.ts","highlight":[{"start":66,"end":82}],"title":"","id":"1589"},{"type":"textOnly","description":"Procedures are the building blocks of your API. Each procedure represents an endpoint that can be a query, mutation, or subscription.","title":"","id":"1604"},{"type":"highlight","description":"The Procedure interface defines the structure of a procedure. It includes a _def object with metadata and types, and a callable function.","file":"packages/server/src/unstable-core-do-not-import/procedure.ts","highlight":[{"start":32,"end":58}],"title":"","id":"1605"},{"type":"textOnly","description":"Procedures can be queries (read operations), mutations (write operations), or subscriptions (real-time updates). They're used to define the API endpoints in your routers.","title":"","id":"1606"},{"type":"highlight","description":"Middleware functions add custom logic before procedures run. They can modify context, input, or halt execution. Example: A simple auth middleware:\n```\nconst authMiddleware = t.middleware(({ ctx, next }) => {\n  if (!ctx.user){\n   throw new TRPCError({ code: 'UNAUTHORIZED' });\n  }\n return next({ ctx: { ...ctx, user: ctx.user } });\n});\n```\n\nUse it in a procedure: \n`t.procedure.use(authMiddleware).query(...)`\n\n","file":"packages/server/src/unstable-core-do-not-import/middleware.ts","highlight":[{"start":89,"end":115}],"title":"","id":"1591"},{"type":"highlight","description":"Adapters allow tRPC to integrate with different server environments. Here's the Node.js HTTP adapter, which handles incoming HTTP requests and routes them to the appropriate procedures.","file":"packages/server/src/adapters/node-http/nodeHTTPRequestHandler.ts","highlight":[{"start":23,"end":97}],"title":"","id":"1592"},{"type":"textOnly","description":"The Fastify adapter allows tRPC to work with Fastify servers. Let's examine its key components.","title":"","id":"1607"},{"type":"highlight","description":"The `fastifyTRPCPlugin` function is the main entry point for integrating tRPC with Fastify.","file":"packages/server/src/adapters/fastify/fastifyTRPCPlugin.ts","highlight":[{"start":32,"end":36}],"title":"","id":"1608"},{"type":"highlight","description":"The plugin configures a custom content type parser for 'application/json' to handle incoming requests.","file":"packages/server/src/adapters/fastify/fastifyTRPCPlugin.ts","highlight":[{"start":37,"end":44}],"title":"","id":"1609"},{"type":"highlight","description":"The plugin sets up a catch-all route to handle tRPC requests.","file":"packages/server/src/adapters/fastify/fastifyTRPCPlugin.ts","highlight":[{"start":54,"end":57}],"title":"","id":"1610"},{"type":"highlight","description":"If enabled, the plugin sets up WebSocket support for real-time communication.","file":"packages/server/src/adapters/fastify/fastifyTRPCPlugin.ts","highlight":[{"start":59,"end":67}],"title":"","id":"1611"},{"type":"textOnly","description":"The resolveResponse function is crucial for tRPC's request handling. It processes requests, executes procedures, and formats responses. Let's break it down.","title":"","id":"1612"},{"type":"highlight","description":"The function takes an object with various properties, including context, request info, and response metadata.","file":"packages/server/src/unstable-core-do-not-import/http/resolveResponse.ts","highlight":[{"start":62,"end":72}],"title":"","id":"1613"},{"type":"highlight","description":"The HTTP status code is set based on the untransformedJSON or defaults to 200.","file":"packages/server/src/unstable-core-do-not-import/http/resolveResponse.ts","highlight":[{"start":82,"end":82}],"title":"","id":"1614"},{"type":"highlight","description":"Data is prepared based on whether it's eager generation or not, and whether it's an array or single item.","file":"packages/server/src/unstable-core-do-not-import/http/resolveResponse.ts","highlight":[{"start":84,"end":89}],"title":"","id":"1615"},{"type":"highlight","description":"Response metadata is generated using the provided responseMeta function or an empty object.","file":"packages/server/src/unstable-core-do-not-import/http/resolveResponse.ts","highlight":[{"start":91,"end":102}],"title":"","id":"1616"},{"type":"highlight","description":"Headers from metadata are added to the response headers.","file":"packages/server/src/unstable-core-do-not-import/http/resolveResponse.ts","highlight":[{"start":104,"end":123}],"title":"","id":"1617"},{"type":"highlight","description":"The status is updated if provided in metadata, and the function returns the final status.","file":"packages/server/src/unstable-core-do-not-import/http/resolveResponse.ts","highlight":[{"start":124,"end":131}],"title":"","id":"1618"},{"type":"highlight","description":"For simpler setups, tRPC provides a way to create a standalone HTTP handler. This function creates a handler that can be used with a basic Node.js HTTP server.","file":"packages/server/src/adapters/standalone.ts","highlight":[{"start":29,"end":46}],"title":"","id":"1595"},{"type":"textOnly","description":"We've covered the main components of the tRPC server package, including routers, procedures, middleware, and adapters. tRPC's architecture is designed to be flexible and extensible, allowing it to integrate with various server environments while maintaining type safety throughout your API. This design enables you to build robust, type-safe APIs with minimal boilerplate code.","title":"","id":"1596"}]}
+{
+  "title": "tRPC Server: Core Components and Architecture",
+  "id": "Clmbyj9AQE3dZugKdxvAd1v5s/W6WBi4jbazUdH/GYw=",
+  "steps": [
+    {
+      "type": "textOnly",
+      "description": "Welcome to the tour of the tRPC server package. We'll explore the main architecture and different components of the server, including routers, procedures, middleware, and adapters. This package forms the backbone of tRPC's server-side functionality, enabling type-safe API development.",
+      "title": "",
+      "id": "1587"
+    },
+    {
+      "type": "highlight",
+      "description": "Let's start with the core of tRPC server: the initTRPC function. This function is used to create and configure the tRPC instance, setting up the foundation for your API.",
+      "file": "packages/server/src/@trpc/server/index.ts",
+      "highlight": [{ "start": 8, "end": 9 }],
+      "title": "",
+      "id": "1588"
+    },
+    {
+      "type": "highlight",
+      "description": "The Router type is a key concept in tRPC. It defines the structure of your API, containing procedures and potentially nested routers.",
+      "file": "packages/server/src/unstable-core-do-not-import/router.ts",
+      "highlight": [{ "start": 66, "end": 82 }],
+      "title": "",
+      "id": "1589"
+    },
+    {
+      "type": "textOnly",
+      "description": "Procedures are the building blocks of your API. Each procedure represents an endpoint that can be a query, mutation, or subscription.",
+      "title": "",
+      "id": "1604"
+    },
+    {
+      "type": "highlight",
+      "description": "The Procedure interface defines the structure of a procedure. It includes a _def object with metadata and types, and a callable function.",
+      "file": "packages/server/src/unstable-core-do-not-import/procedure.ts",
+      "highlight": [{ "start": 32, "end": 58 }],
+      "title": "",
+      "id": "1605"
+    },
+    {
+      "type": "textOnly",
+      "description": "Procedures can be queries (read operations), mutations (write operations), or subscriptions (real-time updates). They're used to define the API endpoints in your routers.",
+      "title": "",
+      "id": "1606"
+    },
+    {
+      "type": "highlight",
+      "description": "Middleware functions add custom logic before procedures run. They can modify context, input, or halt execution. Example: A simple auth middleware:\n```\nconst authMiddleware = t.middleware(({ ctx, next }) => {\n  if (!ctx.user){\n   throw new TRPCError({ code: 'UNAUTHORIZED' });\n  }\n return next({ ctx: { ...ctx, user: ctx.user } });\n});\n```\n\nUse it in a procedure: \n`t.procedure.use(authMiddleware).query(...)`\n\n",
+      "file": "packages/server/src/unstable-core-do-not-import/middleware.ts",
+      "highlight": [{ "start": 89, "end": 115 }],
+      "title": "",
+      "id": "1591"
+    },
+    {
+      "type": "highlight",
+      "description": "Adapters allow tRPC to integrate with different server environments. Here's the Node.js HTTP adapter, which handles incoming HTTP requests and routes them to the appropriate procedures.",
+      "file": "packages/server/src/adapters/node-http/nodeHTTPRequestHandler.ts",
+      "highlight": [{ "start": 23, "end": 97 }],
+      "title": "",
+      "id": "1592"
+    },
+    {
+      "type": "textOnly",
+      "description": "The Fastify adapter allows tRPC to work with Fastify servers. Let's examine its key components.",
+      "title": "",
+      "id": "1607"
+    },
+    {
+      "type": "highlight",
+      "description": "The `fastifyTRPCPlugin` function is the main entry point for integrating tRPC with Fastify.",
+      "file": "packages/server/src/adapters/fastify/fastifyTRPCPlugin.ts",
+      "highlight": [{ "start": 32, "end": 36 }],
+      "title": "",
+      "id": "1608"
+    },
+    {
+      "type": "highlight",
+      "description": "The plugin configures a custom content type parser for 'application/json' to handle incoming requests.",
+      "file": "packages/server/src/adapters/fastify/fastifyTRPCPlugin.ts",
+      "highlight": [{ "start": 37, "end": 44 }],
+      "title": "",
+      "id": "1609"
+    },
+    {
+      "type": "highlight",
+      "description": "The plugin sets up a catch-all route to handle tRPC requests.",
+      "file": "packages/server/src/adapters/fastify/fastifyTRPCPlugin.ts",
+      "highlight": [{ "start": 54, "end": 57 }],
+      "title": "",
+      "id": "1610"
+    },
+    {
+      "type": "highlight",
+      "description": "If enabled, the plugin sets up WebSocket support for real-time communication.",
+      "file": "packages/server/src/adapters/fastify/fastifyTRPCPlugin.ts",
+      "highlight": [{ "start": 59, "end": 67 }],
+      "title": "",
+      "id": "1611"
+    },
+    {
+      "type": "textOnly",
+      "description": "The resolveResponse function is crucial for tRPC's request handling. It processes requests, executes procedures, and formats responses. Let's break it down.",
+      "title": "",
+      "id": "1612"
+    },
+    {
+      "type": "highlight",
+      "description": "The function takes an object with various properties, including context, request info, and response metadata.",
+      "file": "packages/server/src/unstable-core-do-not-import/http/resolveResponse.ts",
+      "highlight": [{ "start": 62, "end": 72 }],
+      "title": "",
+      "id": "1613"
+    },
+    {
+      "type": "highlight",
+      "description": "The HTTP status code is set based on the untransformedJSON or defaults to 200.",
+      "file": "packages/server/src/unstable-core-do-not-import/http/resolveResponse.ts",
+      "highlight": [{ "start": 82, "end": 82 }],
+      "title": "",
+      "id": "1614"
+    },
+    {
+      "type": "highlight",
+      "description": "Data is prepared based on whether it's eager generation or not, and whether it's an array or single item.",
+      "file": "packages/server/src/unstable-core-do-not-import/http/resolveResponse.ts",
+      "highlight": [{ "start": 84, "end": 89 }],
+      "title": "",
+      "id": "1615"
+    },
+    {
+      "type": "highlight",
+      "description": "Response metadata is generated using the provided responseMeta function or an empty object.",
+      "file": "packages/server/src/unstable-core-do-not-import/http/resolveResponse.ts",
+      "highlight": [{ "start": 91, "end": 102 }],
+      "title": "",
+      "id": "1616"
+    },
+    {
+      "type": "highlight",
+      "description": "Headers from metadata are added to the response headers.",
+      "file": "packages/server/src/unstable-core-do-not-import/http/resolveResponse.ts",
+      "highlight": [{ "start": 104, "end": 123 }],
+      "title": "",
+      "id": "1617"
+    },
+    {
+      "type": "highlight",
+      "description": "The status is updated if provided in metadata, and the function returns the final status.",
+      "file": "packages/server/src/unstable-core-do-not-import/http/resolveResponse.ts",
+      "highlight": [{ "start": 124, "end": 131 }],
+      "title": "",
+      "id": "1618"
+    },
+    {
+      "type": "highlight",
+      "description": "For simpler setups, tRPC provides a way to create a standalone HTTP handler. This function creates a handler that can be used with a basic Node.js HTTP server.",
+      "file": "packages/server/src/adapters/standalone.ts",
+      "highlight": [{ "start": 29, "end": 46 }],
+      "title": "",
+      "id": "1595"
+    },
+    {
+      "type": "textOnly",
+      "description": "We've covered the main components of the tRPC server package, including routers, procedures, middleware, and adapters. tRPC's architecture is designed to be flexible and extensible, allowing it to integrate with various server environments while maintaining type safety throughout your API. This design enables you to build robust, type-safe APIs with minimal boilerplate code.",
+      "title": "",
+      "id": "1596"
+    }
+  ]
+}

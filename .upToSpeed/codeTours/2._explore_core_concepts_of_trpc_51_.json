@@ -1,0 +1,84 @@
+{
+  "title": "2. Explore Core Concepts of tRPC",
+  "id": "gg/Sz8191c0+IgQUxN7PgbVoR5ywl57a8ruAoEpKFKk=",
+  "steps": [
+    {
+      "type": "textOnly",
+      "description": "Welcome to our exploration of tRPC's core concepts! Before we dive into tRPC itself, let's start by understanding Remote Procedure Call (RPC).\n\nRemote Procedure Call (RPC) is a protocol that allows a program to execute a procedure or function on another computer as if it were a local call. This concept forms the foundation of many distributed systems and APIs.\n\nKey characteristics of RPC:\n1. Abstraction: It abstracts the complexities of network communication.\n2. Procedure-oriented: Instead of thinking in terms of HTTP methods and resources, you think in terms of function calls.\n3. Language agnostic: RPC can work across different programming languages and platforms.\n\nRPC has been around for decades, but modern implementations like gRPC and tRPC have brought it back into the spotlight, especially in the context of microservices and web applications.",
+      "title": "",
+      "id": "839"
+    },
+    {
+      "type": "textOnly",
+      "description": "Now that we understand RPC, let's introduce tRPC.\n\ntRPC is a modern, TypeScript-first RPC framework designed for building typesafe APIs. It stands out due to its focus on developer experience and type safety.\n\nKey features of tRPC:\n1. End-to-end type safety: tRPC leverages TypeScript to provide full type inference from your API routes to your client, without any code generation.\n2. Lightweight: tRPC has zero dependencies and a tiny client-side footprint.\n3. Easy to learn: If you know how to write TypeScript functions, you already know how to create tRPC procedures.\n4. Framework agnostic: While it works great with React and Next.js, tRPC can be used with any JavaScript framework.\n\ntRPC allows you to build and consume APIs as if the client and server were written in the same codebase, providing a seamless development experience.",
+      "title": "",
+      "id": "840"
+    },
+    {
+      "type": "textOnly",
+      "description": "To fully appreciate tRPC, let's compare it with traditional REST APIs:\n\n1. API Design:\n   - REST: Focuses on resources and HTTP methods (GET, POST, PUT, DELETE).\n   - tRPC: Focuses on procedures (functions) that can be called remotely.\n\n2. Type Safety:\n   - REST: Typically requires additional tools like OpenAPI/Swagger for type definitions.\n   - tRPC: Provides end-to-end type safety out of the box using TypeScript.\n\n3. API Documentation:\n   - REST: Often requires separate documentation or tools like Swagger.\n   - tRPC: Types serve as documentation, with IDE autocompletion providing instant insights.\n\n4. Data Validation:\n   - REST: Usually requires separate validation libraries.\n   - tRPC: Integrates seamlessly with validation libraries like Zod.\n\n5. Client Generation:\n   - REST: Often requires generating client code from API specifications.\n   - tRPC: No client generation needed; types are inferred automatically.\n\n6. Learning Curve:\n   - REST: Requires understanding HTTP methods, status codes, and resource design.\n   - tRPC: If you know TypeScript and function calls, you're mostly ready to go.\n\nWhile REST has its strengths and is widely adopted, tRPC offers a more streamlined, typesafe approach for TypeScript developers, especially in full-stack applications where both frontend and backend are under your control.\n\nIn this tour, we'll explore how tRPC implements these concepts and provides these advantages. Let's begin by looking at some core tRPC code!",
+      "title": "",
+      "id": "841"
+    },
+    {
+      "type": "textOnly",
+      "description": "Welcome to our exploration of tRPC's core concepts! Let's begin by examining the `initTRPC` function. This function is the cornerstone of any tRPC application, serving as the entry point for setting up your tRPC server. The `initTRPC` function is responsible for creating the core building blocks that you'll use to define your API, including routers and procedures. It also allows you to configure global options such as error formatting and data transformation.",
+      "title": "",
+      "id": "842"
+    },
+    {
+      "type": "highlight",
+      "description": "Now, let's look at the implementation of the `initTRPC` function. The file starts with several important imports that provide the core functionality for tRPC:",
+      "file": "packages/server/src/unstable-core-do-not-import/initTRPC.ts",
+      "highlight": [{ "start": 1, "end": 17 }],
+      "title": "",
+      "id": "843"
+    },
+    {
+      "type": "highlight",
+      "description": "Let's examine the `Router` type, a fundamental concept in tRPC that defines the structure of your API. Unlike traditional REST APIs where routes are typically string-based paths, tRPC routers are object-based, enabling type-safe method calls.\n\nRouters in tRPC act as containers for your API procedures, organizing them into a tree-like structure. This structure allows for intuitive nesting and composition of API endpoints, while maintaining full type safety.\n\nThe `Router` interface shown here defines the shape of a tRPC router. Note the `_def` property, which includes the router's configuration and a record of its procedures. This structure is key to tRPC's ability to infer types across your entire API, from server to client.",
+      "file": "packages/server/src/unstable-core-do-not-import/router.ts",
+      "highlight": [{ "start": 66, "end": 82 }],
+      "title": "",
+      "id": "819"
+    },
+    {
+      "type": "highlight",
+      "description": "Let's examine the `Procedure` type, a cornerstone of tRPC's RPC-style API design. Unlike REST endpoints that are resource-centric, tRPC procedures are function-centric, aligning with RPC principles. Each procedure represents a strongly-typed function that can be called remotely.\n\nThe `Procedure` interface defines the structure of these endpoints, ensuring type safety for inputs and outputs. Notice the `$types` property, which captures input and output types, enabling end-to-end type checking.\n\nThis approach differs from REST by focusing on actions (procedures) rather than resources, allowing for more flexibility in API design while maintaining strict type safety.",
+      "file": "packages/server/src/unstable-core-do-not-import/procedure.ts",
+      "highlight": [{ "start": 32, "end": 58 }],
+      "title": "",
+      "id": "820"
+    },
+    {
+      "type": "highlight",
+      "description": "Error handling is crucial in any API. Let's examine the `TRPCError` class, which is used for error handling in tRPC.",
+      "file": "packages/server/src/unstable-core-do-not-import/error/TRPCError.ts",
+      "highlight": [{ "start": 56, "end": 82 }],
+      "title": "",
+      "id": "821"
+    },
+    {
+      "type": "highlight",
+      "description": "On the client side, the `createTRPCClient` function is used to create a typesafe client for your tRPC API. Let's take a look at how it works.",
+      "file": "packages/client/src/createTRPCClient.ts",
+      "highlight": [{ "start": 150, "end": 156 }],
+      "title": "",
+      "id": "822"
+    },
+    {
+      "type": "highlight",
+      "description": "One of tRPC's most powerful features is its ability to infer types. The `inferRouterInputs` and `inferRouterOutputs` types extract input and output types from your router, enabling end-to-end type safety without manual type declarations.\n\nUnlike traditional REST APIs where you might need to maintain separate type definitions or use code generation, tRPC automatically infers types from your router definition. This means your client code gets full type information about your API, reducing errors and improving developer productivity.\n\nThese inferred types can be used throughout your application, ensuring type consistency between your server and client code. This level of type safety is a key differentiator of tRPC compared to traditional API approaches.",
+      "file": "packages/server/src/unstable-core-do-not-import/clientish/inference.ts",
+      "highlight": [{ "start": 50, "end": 60 }],
+      "title": "",
+      "id": "823"
+    },
+    {
+      "type": "textOnly",
+      "description": "We've explored the core concepts of tRPC, including initialization, routers, procedures, error handling, client creation, and type inference. These concepts work together to create a typesafe, efficient API layer. tRPC's approach differs from traditional REST APIs by focusing on RPC-style method calls and leveraging TypeScript's type system for end-to-end type safety. This allows for a more streamlined development process, reducing the need for manual type declarations and enabling better tooling support.",
+      "title": "",
+      "id": "824"
+    }
+  ]
+}

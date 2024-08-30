@@ -1,0 +1,132 @@
+{
+  "title": "3. Learn About tRPC Routers and Procedures",
+  "id": "9+7Em5kwNpzMneF15dcvAmxHF1CzMbImut8wOqH5OzI=",
+  "steps": [
+    {
+      "type": "textOnly",
+      "description": "Welcome to the tour on tRPC routers and procedures! \n\ntRPC is a TypeScript-first framework for building end-to-end type-safe APIs without schemas or code generation. At its core, tRPC uses two main concepts:\n\n1. Routers: These organize your API endpoints into logical groups.\n2. Procedures: These define the actual API endpoints and their behavior.\n\nBy using tRPC, you gain:\n- End-to-end type safety between your client and server\n- Improved developer experience with autocompletion\n- Reduced boilerplate code\n\nIn this tour, we'll explore how to define and use routers and procedures, examining their implementation and understanding how they contribute to building robust, type-safe APIs. We'll start with the foundational concepts and then dive into the actual code that makes tRPC work.\n\nLet's begin our journey into the world of tRPC!",
+      "title": "",
+      "id": "825"
+    },
+    {
+      "type": "textOnly",
+      "description": "Let's start by understanding the concept of routers in tRPC. Routers are a fundamental building block in tRPC that allow you to organize your API endpoints into a structured hierarchy. They act as containers for your procedures (which we'll explore later) and can be nested to create complex API structures. Routers help in logically grouping related functionality and maintaining a clean, organized API design.",
+      "title": "",
+      "id": "844"
+    },
+    {
+      "type": "highlight",
+      "description": "Now, let's examine the `createRouterFactory` function in the `router.ts` file. This function is the core implementation for creating tRPC routers.",
+      "file": "packages/server/src/unstable-core-do-not-import/router.ts",
+      "highlight": [{ "start": 155, "end": 162 }],
+      "title": "",
+      "id": "845"
+    },
+    {
+      "type": "textOnly",
+      "description": "The `createRouterFactory` function is a higher-order function that takes a `config` parameter of type `RootConfig<TRoot>`. It returns another function, `createRouterInner`, which is overloaded to accept either a `RouterRecord` or `CreateRouterOptions`. This design allows for flexible router creation with type safety. The generic type `TRoot` extends `AnyRootTypes`, ensuring that the created router is compatible with the root types defined in your tRPC setup.",
+      "title": "",
+      "id": "846"
+    },
+    {
+      "type": "highlight",
+      "description": "Now, let's examine how procedures are created in tRPC. Procedures are the building blocks of your API, defining the operations that can be performed. The `createBuilder` function in `procedureBuilder.ts` is crucial for this process.\n\nThis function creates a procedure builder, which allows you to define the input, output, and behavior of your API endpoints. The type parameters (TContext, TMeta) ensure type safety throughout your API.\n\nThe `createBuilder` function is typically used internally by tRPC to set up the foundation for creating procedures. When you use methods like `t.procedure()` in your tRPC router, you're indirectly using the result of this `createBuilder` function.\n\nLet's look at its structure:",
+      "file": "packages/server/src/unstable-core-do-not-import/procedureBuilder.ts",
+      "highlight": [{ "start": 401, "end": 412 }],
+      "title": "",
+      "id": "827"
+    },
+    {
+      "type": "highlight",
+      "description": "The `Procedure` interface is crucial for defining tRPC procedures. Let's examine its key properties:\n\n1. `_def.$types`: Defines the input and output types, ensuring type-safety.\n2. `type`: Specifies the procedure type (query, mutation, or subscription).\n3. `meta`: Allows attaching metadata to procedures.\n4. `(opts: ProcedureCallOptions<unknown>): Promise<TDef['output']>`: The callable function that executes the procedure.\n\nThese properties enable tRPC to create type-safe, well-structured API endpoints.",
+      "file": "packages/server/src/unstable-core-do-not-import/procedure.ts",
+      "highlight": [{ "start": 32, "end": 58 }],
+      "title": "",
+      "id": "828"
+    },
+    {
+      "type": "highlight",
+      "description": "The `initTRPC` function is a crucial starting point for creating a tRPC API. It initializes the core building blocks for your API, including routers and procedures.\n\nHere's how `initTRPC` fits into the bigger picture:\n\n1. It creates a tRPC instance with your desired configuration.\n2. This instance provides methods to create routers and procedures.\n3. These routers and procedures are then used to define your API structure and endpoints.\n\nTypically, you'd use `initTRPC` like this in your API setup:\n\nconst t = initTRPC.create();\nconst router = t.router;\nconst publicProcedure = t.procedure;\n\nThe `inferErrorFormatterShape` type shown here is part of the error handling system, allowing you to customize error shapes in your API responses.",
+      "file": "packages/server/src/unstable-core-do-not-import/initTRPC.ts",
+      "highlight": [{ "start": 19, "end": 24 }],
+      "title": "",
+      "id": "829"
+    },
+    {
+      "type": "textOnly",
+      "description": "Input validation is a crucial aspect of building robust APIs. In tRPC, this is handled by the `createInputMiddleware` function. Let's examine how tRPC implements input validation to ensure type safety and data integrity.",
+      "title": "",
+      "id": "847"
+    },
+    {
+      "type": "highlight",
+      "description": "The `createInputMiddleware` function creates a middleware that validates and parses input. It takes a `parse` function as an argument and returns an async middleware function.",
+      "file": "packages/server/src/unstable-core-do-not-import/middleware.ts",
+      "highlight": [{ "start": 181, "end": 184 }],
+      "title": "",
+      "id": "848"
+    },
+    {
+      "type": "highlight",
+      "description": "Inside the middleware, the raw input is retrieved and parsed. If parsing fails, a `TRPCError` with a 'BAD_REQUEST' code is thrown. This ensures that invalid inputs are caught and reported appropriately.",
+      "file": "packages/server/src/unstable-core-do-not-import/middleware.ts",
+      "highlight": [{ "start": 186, "end": 194 }],
+      "title": "",
+      "id": "849"
+    },
+    {
+      "type": "highlight",
+      "description": "After successful parsing, the middleware combines the parsed input with any existing input. This allows for multiple input parsers to be used in sequence, each adding to or modifying the input data.",
+      "file": "packages/server/src/unstable-core-do-not-import/middleware.ts",
+      "highlight": [{ "start": 196, "end": 205 }],
+      "title": "",
+      "id": "850"
+    },
+    {
+      "type": "textOnly",
+      "description": "Now that we've examined the components of tRPC routers and procedures, let's put it all together by creating a complete API endpoint. Here's an example of how you might define a router with a procedure for a user registration endpoint:\n\n```typescript\nimport { initTRPC } from '@trpc/server';\nimport { z } from 'zod';\n\nconst t = initTRPC.create();\n\nconst userRouter = t.router({\n  register: t.procedure\n    .input(z.object({\n      username: z.string().min(3).max(20),\n      email: z.string().email(),\n      password: z.string().min(8)\n    }))\n    .mutation(async ({ input }) => {\n      // Here you would typically:\n      // 1. Hash the password\n      // 2. Save the user to the database\n      // 3. Return the created user (excluding sensitive information)\n      \n      return { \n        id: 'generated-id',\n        username: input.username,\n        email: input.email\n      };\n    }),\n});\n\nexport const appRouter = t.router({\n  user: userRouter,\n});\n\nexport type AppRouter = typeof appRouter;\n```\n\nThis example demonstrates how to:\n1. Create a router using `t.router()`\n2. Define a procedure using `t.procedure`\n3. Use Zod for input validation\n4. Implement the procedure logic as a mutation\n\nThe resulting `appRouter` can be used to create a type-safe API that ensures the input is valid before executing the procedure logic.",
+      "title": "",
+      "id": "851"
+    },
+    {
+      "type": "textOnly",
+      "description": "Error formatting is a crucial aspect of building robust APIs with tRPC. It allows you to provide meaningful and consistent error messages to your API consumers. Let's explore how tRPC handles error formatting.",
+      "title": "",
+      "id": "852"
+    },
+    {
+      "type": "highlight",
+      "description": "The `ErrorFormatter` type defines the structure of a function that formats error messages. Let's examine its parameters:",
+      "file": "packages/server/src/unstable-core-do-not-import/error/formatter.ts",
+      "highlight": [{ "start": 12, "end": 19 }],
+      "title": "",
+      "id": "853"
+    },
+    {
+      "type": "textOnly",
+      "description": "To use the `ErrorFormatter`, you can define a custom function that takes the provided parameters and returns a shaped error object. This function can be passed to the `initTRPC` function when setting up your tRPC instance. For example:\n\n```typescript\nconst t = initTRPC.create({\n  errorFormatter({ shape, error }) {\n    return {\n      ...shape,\n      data: {\n        ...shape.data,\n        customErrorField: error.code === 'INTERNAL_SERVER_ERROR' ? 'There was a problem' : error.message,\n      },\n    };\n  },\n});\n```\n\nThis custom error formatter adds a `customErrorField` to the error shape, providing more context about the error to the client.",
+      "title": "",
+      "id": "854"
+    },
+    {
+      "type": "textOnly",
+      "description": "Now that we've set up our router, procedures, and error handling on the server-side, let's see how to use the API from the client-side. tRPC's client seamlessly integrates with the server, providing end-to-end type safety.\n\nHere's an example of how you might use a tRPC procedure on the client:\n\n```typescript\nimport { createTRPCProxyClient, httpBatchLink } from '@trpc/client';\nimport type { AppRouter } from './server'; // Your server-side router type\n\nconst client = createTRPCProxyClient<AppRouter>({\n  links: [\n    httpBatchLink({\n      url: 'http://localhost:3000/trpc',\n    }),\n  ],\n});\n\n// Using a query procedure\nconst result = await client.users.getUser.query({ id: '1' });\nconsole.log(result); // TypeScript knows the exact shape of 'result'\n\n// Using a mutation procedure\nconst newUser = await client.users.createUser.mutate({ name: 'Alice' });\nconsole.log(newUser); // TypeScript knows the exact shape of 'newUser'\n```\n\nNotice how TypeScript provides full type inference for the procedure inputs and outputs. This end-to-end type safety is a key feature of tRPC, ensuring that your client and server stay in sync.",
+      "title": "",
+      "id": "855"
+    },
+    {
+      "type": "highlight",
+      "description": "tRPC supports data transformation. Let's examine the `DataTransformer` interface.",
+      "file": "packages/server/src/unstable-core-do-not-import/transformer.ts",
+      "highlight": [{ "start": 13, "end": 16 }],
+      "title": "",
+      "id": "832"
+    },
+    {
+      "type": "textOnly",
+      "description": "Congratulations on completing this tour of tRPC routers and procedures! Let's recap the key components we've explored:\n\n1. Router creation with `createRouterFactory`\n2. Procedure definition using `createBuilder`\n3. The `Procedure` interface structure\n4. Initializing tRPC with `initTRPC`\n5. Input validation via `createInputMiddleware`\n6. Error formatting with `ErrorFormatter`\n7. Data transformation using `DataTransformer`\n\nThese building blocks enable you to create robust, type-safe APIs. The power of tRPC lies in its end-to-end type safety and seamless backend-frontend integration. As a senior engineer, you can leverage these concepts to build scalable and maintainable APIs.\n\nTry implementing a simple tRPC router with a few procedures in your next project to solidify your understanding. Happy coding!",
+      "title": "",
+      "id": "833"
+    }
+  ]
+}

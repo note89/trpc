@@ -1,0 +1,84 @@
+{
+  "title": "6. Exploring tRPC Links and Request Batching",
+  "id": "8z1cT7ShpAwwWs0+BCDOyfz+H5lizWDmkVkrEVmComI=",
+  "steps": [
+    {
+      "type": "textOnly",
+      "description": "Welcome to this code tour on tRPC's links and request batching! In this tour, we'll explore how tRPC implements links to customize the flow of data between the client and server, and how it handles request batching for improved performance. We'll start by looking at the core concepts and then dive into the implementation details.",
+      "title": "",
+      "id": "856"
+    },
+    {
+      "type": "revealFiles",
+      "files": ["packages/client/src/links/types.ts"],
+      "description": "Let's start by examining the TRPCLink type. This is the foundation of tRPC's link system. A link is a function that takes an operation and returns an observable. It allows you to customize how requests are handled, enabling features like batching, retrying, or adding custom logic to your API calls.",
+      "title": "",
+      "id": "857"
+    },
+    {
+      "type": "revealFiles",
+      "files": ["packages/client/src/links/httpBatchLink.ts"],
+      "description": "Let's start by examining the httpBatchLink function. This function is responsible for creating a link that batches multiple tRPC operations into a single HTTP request, which can significantly improve performance by reducing the number of network requests.",
+      "title": "",
+      "id": "882"
+    },
+    {
+      "type": "highlight",
+      "description": "Now, let's look at the BatchLoader implementation within the httpBatchLink function. The BatchLoader is responsible for grouping and validating batched operations.",
+      "file": "packages/client/src/links/httpBatchLink.ts",
+      "highlight": [{ "start": 28, "end": 83 }],
+      "title": "",
+      "id": "883"
+    },
+    {
+      "type": "highlight",
+      "description": "After defining the BatchLoader, the httpBatchLink creates separate data loaders for queries and mutations. This allows for different handling of these operation types.",
+      "file": "packages/client/src/links/httpBatchLink.ts",
+      "highlight": [{ "start": 85, "end": 88 }],
+      "title": "",
+      "id": "884"
+    },
+    {
+      "type": "highlight",
+      "description": "Finally, let's examine how the httpBatchLink handles individual operations and processes the responses. This part of the code demonstrates how tRPC uses observables to manage asynchronous operations and error handling.",
+      "file": "packages/client/src/links/httpBatchLink.ts",
+      "highlight": [{ "start": 89, "end": 136 }],
+      "title": "",
+      "id": "885"
+    },
+    {
+      "type": "revealFiles",
+      "files": ["packages/client/src/internals/dataLoader.ts"],
+      "description": "The dataLoader function is a crucial component in tRPC's request batching system, working in tandem with httpBatchLink. It efficiently groups multiple requests and dispatches them as a single batch, significantly reducing network overhead.\n\nKey aspects of dataLoader:\n1. Batching logic: It collects individual requests into groups (lines 47-84).\n2. Dispatch mechanism: It sends batched requests and handles responses (lines 86-134).\n3. Promise-based API: It provides a simple 'load' method for adding requests to a batch (lines 135-159).\n\nBy integrating with httpBatchLink, dataLoader enables tRPC to optimize API calls, improving performance especially for applications with high request volumes. This batching mechanism is a core feature that sets tRPC apart in terms of efficiency and scalability.",
+      "title": "",
+      "id": "859"
+    },
+    {
+      "type": "revealFiles",
+      "files": ["packages/client/src/links/splitLink.ts"],
+      "description": "The splitLink function allows you to conditionally choose between different links based on the operation type. This is crucial for implementing varied behaviors for different request types.\n\nHere's a practical example of using splitLink:\n\nconst link = splitLink({\n  condition: (op) => op.type === 'subscription',\n  true: wsLink,\n  false: httpBatchLink\n});\n\nIn this example, subscription operations are routed to a WebSocket link (wsLink), while queries and mutations use the HTTP batch link (httpBatchLink). This setup optimizes real-time communication for subscriptions while leveraging efficient batching for other operations.\n\nThe splitLink function is a key component in tRPC's flexible link system, allowing developers to create sophisticated request handling pipelines tailored to their application's needs.",
+      "title": "",
+      "id": "860"
+    },
+    {
+      "type": "revealFiles",
+      "files": ["packages/client/src/links/internals/createChain.ts"],
+      "description": "The createChain function is responsible for executing a series of links in order. It creates a chain of links where each link can modify the operation or pass it to the next link. This is how tRPC composes multiple links to create a custom request pipeline.",
+      "title": "",
+      "id": "861"
+    },
+    {
+      "type": "revealFiles",
+      "files": ["packages/server/src/observable/observable.ts"],
+      "description": "tRPC leverages observables to handle asynchronous operations in its link system. Observables offer several key benefits:\n\n1. Flexibility: They can emit multiple values over time, ideal for streaming data.\n2. Cancellation: Easily cancel long-running operations, crucial for resource management.\n3. Composition: Chain and combine multiple asynchronous operations efficiently.\n\nIn tRPC's link system, observables enable:\n- Seamless handling of WebSocket connections for real-time updates.\n- Efficient request batching and debouncing.\n- Easy implementation of retry logic and error handling.\n\nThe `observable` function creates a standardized interface for these asynchronous operations, allowing tRPC to maintain a consistent API across different types of requests and data flows.",
+      "title": "",
+      "id": "862"
+    },
+    {
+      "type": "textOnly",
+      "description": "In this tour, we've explored how tRPC implements links and request batching. We've seen how links provide a flexible way to customize the request pipeline, how batching is implemented using dataLoader, and how observables are used to handle asynchronous operations. This system allows tRPC to efficiently handle various types of requests while providing a great developer experience. The combination of links, batching, and observables makes tRPC a powerful tool for building type-safe APIs with excellent performance characteristics.",
+      "title": "",
+      "id": "863"
+    }
+  ]
+}

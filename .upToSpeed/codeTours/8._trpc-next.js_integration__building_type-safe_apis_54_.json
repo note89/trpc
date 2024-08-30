@@ -1,0 +1,82 @@
+{
+  "title": "8. tRPC-Next.js Integration: Building Type-Safe APIs",
+  "id": "kcJxlkvrr8DMhHIbk1ZZifnTamBpK7uBkn5+lwsn5kA=",
+  "steps": [
+    {
+      "type": "textOnly",
+      "description": "Welcome to this tour of tRPC's integration with Next.js! We'll explore how tRPC seamlessly works with Next.js to provide type-safe API calls between your client and server. This integration simplifies development and enhances type safety across your full-stack application.",
+      "title": "",
+      "id": "864"
+    },
+    {
+      "type": "highlight",
+      "description": "Let's start by examining the createTRPCNext function. This function is the core of tRPC's integration with Next.js, providing a set of utilities and hooks specifically for Next.js applications. It takes options for configuring tRPC and returns an object with various utilities.",
+      "file": "packages/next/src/createTRPCNext.tsx",
+      "highlight": [{ "start": 60, "end": 65 }],
+      "title": "",
+      "id": "886"
+    },
+    {
+      "type": "highlight",
+      "description": "Inside createTRPCNext, we first create root hooks using createRootHooks. These hooks are essential for managing tRPC state and operations within React components. The withTRPC function is also initialized here, which is used to wrap the Next.js App component for tRPC integration.",
+      "file": "packages/next/src/createTRPCNext.tsx",
+      "highlight": [{ "start": 66, "end": 74 }],
+      "title": "",
+      "id": "887"
+    },
+    {
+      "type": "highlight",
+      "description": "The function returns a flat proxy object that provides access to various tRPC utilities. This includes hooks like useContext, useUtils, useQueries, and useSuspenseQueries. The proxy also includes the withTRPC higher-order component. This structure allows for easy access to tRPC functionality throughout your Next.js application.",
+      "file": "packages/next/src/createTRPCNext.tsx",
+      "highlight": [{ "start": 76, "end": 101 }],
+      "title": "",
+      "id": "888"
+    },
+    {
+      "type": "highlight",
+      "description": "Next, let's examine the createNextApiHandler function. This function creates a Next.js API handler that's compatible with tRPC, allowing you to serve your tRPC router through Next.js API routes.",
+      "file": "packages/server/src/adapters/next.ts",
+      "highlight": [{ "start": 31, "end": 74 }],
+      "title": "",
+      "id": "866"
+    },
+    {
+      "type": "highlight",
+      "description": "The withTRPC function is a higher-order component that wraps your Next.js App component. It sets up the tRPC client and provides the necessary context for your application.",
+      "file": "packages/next/src/withTRPC.tsx",
+      "highlight": [{ "start": 34, "end": 84 }],
+      "title": "",
+      "id": "867"
+    },
+    {
+      "type": "highlight",
+      "description": "The httpBatchLink is a crucial component in tRPC's integration with Next.js, enabling efficient batching of HTTP requests. Let's examine its implementation and a practical example of its configuration.\n\nIn a typical Next.js application using tRPC, you'd configure httpBatchLink in your tRPC client setup, often in a file like 'utils/trpc.ts':\n\nimport { httpBatchLink } from '@trpc/client';\n\nexport const trpc = createTRPCNext<AppRouter>({\n  config() {\n    return {\n      links: [\n        httpBatchLink({\n          url: 'http://localhost:3000/api/trpc',\n        }),\n      ],\n    };\n  },\n});\n\nThis configuration batches multiple tRPC procedure calls into a single HTTP request, significantly improving performance by reducing network overhead. The 'url' parameter points to your tRPC API endpoint in Next.js.\n\nNow, let's look at the httpBatchLink implementation to understand how it works under the hood.",
+      "file": "packages/client/src/links/httpBatchLink.ts",
+      "highlight": [{ "start": 6, "end": 71 }],
+      "title": "",
+      "id": "868"
+    },
+    {
+      "type": "highlight",
+      "description": "The initTRPC function is a crucial part of setting up tRPC in a Next.js application. It initializes the tRPC backend, defining the base router and procedure builders. In a typical Next.js project, you'd create a separate file (often named `trpc.ts` or `trpc.js`) in your server directory to set this up. Here's how it might look:\n\nIn this example, we're creating a router and defining procedure builders. The `publicProcedure` can be used for endpoints that don't require authentication, while `protectedProcedure` could be used for authenticated routes.\n\nThis setup allows you to create type-safe API routes that can be easily consumed by your Next.js frontend, bridging the gap between your server and client code.",
+      "file": "packages/server/src/unstable-core-do-not-import/initTRPC.ts",
+      "highlight": [{ "start": 19, "end": 24 }],
+      "title": "",
+      "id": "869"
+    },
+    {
+      "type": "highlight",
+      "description": "Let's look at a practical example of how tRPC is typically set up in a Next.js application. This file shows how to create the tRPC client and set up the necessary configuration.",
+      "file": "examples/next-minimal-starter/src/utils/trpc.ts",
+      "highlight": [{ "start": 22, "end": 34 }],
+      "title": "",
+      "id": "870"
+    },
+    {
+      "type": "textOnly",
+      "description": "We've explored tRPC's integration with Next.js, from core functions to typical setup. Now, let's see how to use tRPC hooks in a Next.js component:\n\nExample usage in a Next.js page component:\n\n1. Import the `trpc` object we created earlier.\n2. Use the `trpc.yourProcedure.useQuery()` hook to fetch data.\n3. Use the `trpc.yourProcedure.useMutation()` hook for data modifications.\n\nThis pattern enables type-safe, efficient communication between your Next.js frontend and your tRPC backend, streamlining full-stack development.\n\nExplore integrating these hooks into your components to experience the full power of tRPC in Next.js.",
+      "title": "",
+      "id": "871"
+    }
+  ]
+}

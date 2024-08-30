@@ -1,0 +1,88 @@
+{
+  "title": "5. Understand Error Handling and Middleware",
+  "id": "7QzKU8LORzUeU3tgg4GRd1tc3A1aCUyTZFY6LIjQuNM=",
+  "steps": [
+    {
+      "type": "textOnly",
+      "description": "Welcome to the tour on error handling and middleware in tRPC! In this tour, we'll explore how tRPC manages errors and implements middleware to enhance functionality. We'll start by looking at the core error handling mechanisms and then move on to middleware implementation.",
+      "title": "",
+      "id": "872"
+    },
+    {
+      "type": "highlight",
+      "description": "The TRPCError class is the foundation of tRPC's error handling system. It extends the standard Error class and introduces a 'code' property for specific error types. This class is defined in the TRPCError.ts file:",
+      "file": "packages/server/src/unstable-core-do-not-import/error/TRPCError.ts",
+      "highlight": [{ "start": 56, "end": 61 }],
+      "title": "",
+      "id": "889"
+    },
+    {
+      "type": "highlight",
+      "description": "The TRPCError constructor allows for customization of error messages, codes, and causes. It uses the getCauseFromUnknown function to handle various cause types and ensures compatibility with different JavaScript environments:",
+      "file": "packages/server/src/unstable-core-do-not-import/error/TRPCError.ts",
+      "highlight": [{ "start": 62, "end": 82 }],
+      "title": "",
+      "id": "890"
+    },
+    {
+      "type": "highlight",
+      "description": "Next, let's look at how errors are formatted in tRPC. The ErrorFormatter type defines a function that takes various error-related parameters and returns a custom error shape.",
+      "file": "packages/server/src/unstable-core-do-not-import/error/formatter.ts",
+      "highlight": [{ "start": 12, "end": 19 }],
+      "title": "",
+      "id": "874"
+    },
+    {
+      "type": "highlight",
+      "description": "The getErrorShape function is responsible for creating a standardized error shape when an error occurs during procedure execution. It takes various inputs and constructs a default error shape with properties like message, code, and HTTP status.",
+      "file": "packages/server/src/unstable-core-do-not-import/error/getErrorShape.ts",
+      "highlight": [{ "start": 11, "end": 36 }],
+      "title": "",
+      "id": "875"
+    },
+    {
+      "type": "highlight",
+      "description": "tRPC provides a helper function, getHTTPStatusCodeFromError, to extract the HTTP status code from a TRPCError. This function maps tRPC error codes to appropriate HTTP status codes.",
+      "file": "packages/server/src/unstable-core-do-not-import/http/getHTTPStatusCode.ts",
+      "highlight": [{ "start": 59, "end": 61 }],
+      "title": "",
+      "id": "876"
+    },
+    {
+      "type": "textOnly",
+      "description": "Now that we've explored error handling in tRPC, let's shift our focus to middleware. Middleware in tRPC allows you to add custom logic to the request-response cycle, enabling features like authentication, logging, and more.",
+      "title": "",
+      "id": "877"
+    },
+    {
+      "type": "highlight",
+      "description": "The MiddlewareFunction type defines the structure of a middleware function in tRPC. It takes an options object with context, input, and other properties, and returns a Promise with a MiddlewareResult. Let's break this down with a simple example:\n\nImagine a logging middleware that records the procedure type and path:\n\nconst loggingMiddleware: MiddlewareFunction = async ({ ctx, type, path, next }) => {\n  console.log(`Executing ${type} procedure at path: ${path}`);\n  return next();\n};\n\nThis example demonstrates how a middleware function receives context, type, and path from the options object, logs the information, and then calls next() to continue the request chain. The MiddlewareFunction type ensures type safety and structure for such implementations.",
+      "file": "packages/server/src/unstable-core-do-not-import/middleware.ts",
+      "highlight": [{ "start": 89, "end": 115 }],
+      "title": "",
+      "id": "878"
+    },
+    {
+      "type": "highlight",
+      "description": "The createMiddlewareFactory function is used to create middleware in tRPC. It returns a function that creates a middleware builder, allowing you to chain multiple middleware functions.\n\nFor example, you can chain middleware like this:\n\nconst middleware = t.middleware;\nconst loggerMiddleware = middleware((opts) => { /* logging logic */ });\nconst authMiddleware = middleware((opts) => { /* auth logic */ });\n\nconst protectedProcedure = t.procedure.use(loggerMiddleware).use(authMiddleware);\n\nThis chaining allows you to apply multiple middleware functions to a procedure, each adding its own functionality to the request-response cycle.",
+      "file": "packages/server/src/unstable-core-do-not-import/middleware.ts",
+      "highlight": [{ "start": 122, "end": 156 }],
+      "title": "",
+      "id": "879"
+    },
+    {
+      "type": "highlight",
+      "description": "The initTRPC function is the entry point for creating a tRPC instance. It allows you to configure error formatting and create procedures that can use middleware.",
+      "file": "packages/server/src/unstable-core-do-not-import/initTRPC.ts",
+      "highlight": [{ "start": 51, "end": 56 }],
+      "title": "",
+      "id": "880"
+    },
+    {
+      "type": "textOnly",
+      "description": "Let's see how error handling and middleware work together in tRPC. Imagine a scenario where we have an authentication middleware and an error occurs during a procedure call:\n\n1. The authentication middleware checks the user's token.\n2. If authentication fails, it throws a TRPCError with code 'UNAUTHORIZED'.\n3. The error is caught by tRPC's error handling system.\n4. The getErrorShape function formats the error, including the HTTP status code (401 for UNAUTHORIZED).\n5. The formatted error is sent back to the client.\n\nThis example demonstrates how middleware can trigger errors, which are then processed by the error handling system, resulting in a type-safe, consistent error response.",
+      "title": "",
+      "id": "881"
+    }
+  ]
+}
